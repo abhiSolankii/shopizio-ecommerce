@@ -450,6 +450,41 @@ const Home = () => {
           )}
         </div>
       </div>
+      {/* Popular Categories */}
+      <div className="pb-4 flex flex-col">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">
+          Popular Categories
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className="flex items-center bg-white rounded-xl shadow-md p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 border border-gray-100"
+            >
+              {/* Category Image */}
+              <div className="w-20 h-20 mr-6">
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="w-full h-full object-cover rounded-lg shadow-sm"
+                />
+              </div>
+              {/* Category Details */}
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-gray-800 mb-1">
+                  {category.name}
+                </h3>
+                <p className="text-sm text-gray-500">240 Items Available</p>
+                <div className="mt-2">
+                  <span className="inline-block px-3 py-1 text-xs font-medium text-green-600 bg-green-100 rounded-full">
+                    Explore Now
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
