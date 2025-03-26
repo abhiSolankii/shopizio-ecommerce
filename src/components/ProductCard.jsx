@@ -3,17 +3,28 @@ import { Heart } from "lucide-react";
 import { useProduct } from "../context/ProductContext";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const ProductCard = ({ product }) => {
   const { addToCart, addToFavorites, removeFromFavorites, isFavorite } =
     useProduct();
 
+  const { currentUser } = useAuth();
+
   const handleAddToCart = () => {
+    if (!currentUser) {
+      toast.error("You must be logged in to add to cart");
+      return;
+    }
     addToCart(product);
     toast.success(`${product.title} added to cart!`);
   };
 
   const handleToggleFavorite = () => {
+    if (!currentUser) {
+      toast.error("You must be logged in to like product");
+      return;
+    }
     if (isFavorite(product.id)) {
       removeFromFavorites(product.id);
     } else {

@@ -7,6 +7,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth } from "../config/firbaseConfig";
+import { useProduct } from "./ProductContext";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);

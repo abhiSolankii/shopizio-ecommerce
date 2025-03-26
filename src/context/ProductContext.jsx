@@ -92,6 +92,11 @@ const ProductProvider = ({ children }) => {
     setCart([]);
   };
 
+  //clear favorites
+  const clearFavorites = () => {
+    setFavorites([]);
+  };
+
   // Calculate total cart price
   const getCartTotal = () => {
     return cart.reduce((total, item) => {
@@ -112,6 +117,7 @@ const ProductProvider = ({ children }) => {
     isFavorite,
     cart,
     addToCart,
+    clearFavorites,
     removeFromCart,
     updateCartQuantity,
     clearCart,

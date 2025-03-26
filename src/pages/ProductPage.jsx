@@ -2,13 +2,16 @@ import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useProduct } from "../context/ProductContext";
 import { generalProducts } from "../utils/data";
-import { Star, Truck, Package } from "lucide-react";
+import { Star, Truck, Package, Heart } from "lucide-react";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 
 // A detailed product page with a clean, modern design
 const ProductPage = () => {
   const { id } = useParams();
-  const { addToCart } = useProduct();
+  const { addToCart, isFavorite, removeFromFavorites, addToFavorites } =
+    useProduct();
+  const { currentUser } = useAuth();
 
   // Find the product by ID
   const product = generalProducts.find((p) => p.id === parseInt(id));
@@ -32,6 +35,10 @@ const ProductPage = () => {
 
   // Handle adding to cart
   const handleAddToCart = () => {
+    if (!currentUser) {
+      toast.error("You must be logged in to add to cart");
+      return;
+    }
     addToCart(product, quantity);
     toast.success(`${product.title} added to cart!`);
   };
@@ -39,6 +46,17 @@ const ProductPage = () => {
   // Handle quantity change
   const handleQuantityChange = (change) => {
     setQuantity((prev) => Math.max(1, prev + change));
+  };
+  const handleToggleFavorite = () => {
+    if (!currentUser) {
+      toast.error("You must be logged in to like product");
+      return;
+    }
+    if (isFavorite(product.id)) {
+      removeFromFavorites(product.id);
+    } else {
+      addToFavorites(product);
+    }
   };
 
   return (
@@ -87,8 +105,20 @@ const ProductPage = () => {
 
         {/* Product Details */}
         <div className="flex flex-col gap-4">
-          {/* Title */}
-          <h1 className="text-3xl font-bold text-gray-800">{product.title}</h1>
+          <div className="flex items-center justify-between pr-10">
+            {/* Title */}
+            <h1 className="text-3xl font-bold text-gray-800">
+              {product.title.slice(0, 30)}...
+            </h1>
+            <button
+              onClick={handleToggleFavorite}
+              className={`${
+                isFavorite(product.id) ? "text-red-500" : "text-gray-500"
+              } hover:text-red-500 `}
+            >
+              <Heart size={30} fill={isFavorite(product.id) ? "red" : "none"} />
+            </button>
+          </div>
 
           {/* Rating */}
           <div className="flex items-center gap-2">

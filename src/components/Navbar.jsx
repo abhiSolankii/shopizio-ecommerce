@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useProduct } from "../context/ProductContext";
+import { useAuth } from "../context/AuthContext"; // Import AuthContext
 import { generalProducts } from "../utils/data";
-import { ChevronDown, Search, ShoppingCart, User, Heart } from "lucide-react";
+import {
+  ChevronDown,
+  Search,
+  ShoppingCart,
+  User,
+  Heart,
+  LogOut,
+} from "lucide-react";
 
 // Navbar component that sticks to the top of the page
 const Navbar = () => {
   // Access favorites and cart from ProductContext
-  const { favorites, cart } = useProduct();
+  const { favorites, cart, clearCart, clearFavorites } = useProduct();
+  const { currentUser, logout } = useAuth(); // Access auth state and logout function
   const navigate = useNavigate();
 
   // Calculate counts for favorites and cart
@@ -19,19 +28,21 @@ const Navbar = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // State for account dropdown
+  const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   // Handle search input changes
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
 
-    // If the search query is empty, clear results and close dropdown
     if (query.trim() === "") {
       setFilteredProducts([]);
       setIsSearchOpen(false);
       return;
     }
 
-    // Filter products based on the search query (case-insensitive)
     const results = generalProducts
       .filter((product) =>
         product.title.toLowerCase().includes(query.toLowerCase())
@@ -44,21 +55,48 @@ const Navbar = () => {
 
   // Handle clicking a search result to navigate to the product page
   const handleSearchResultClick = (id) => {
-    setSearchQuery(""); // Clear the search input
-    setFilteredProducts([]); // Clear the results
-    setIsSearchOpen(false); // Close the dropdown
-    navigate(`/product/${id}`); // Navigate to the product page
+    setSearchQuery("");
+    setFilteredProducts([]);
+    setIsSearchOpen(false);
+    navigate(`/product/${id}`);
   };
 
   // Close the search dropdown when clicking outside
   const handleBlur = () => {
     setTimeout(() => {
       setIsSearchOpen(false);
-    }, 200); // Small delay to allow clicking on a result
+    }, 200);
+  };
+
+  // Toggle the account dropdown
+  const toggleAccountDropdown = () => {
+    setIsAccountDropdownOpen((prev) => !prev);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsAccountDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/auth/login");
+      clearCart();
+      clearFavorites();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
-    // Sticky navbar with a white background
     <div className="w-full bg-white sticky top-0 z-50 shadow-sm">
       <div className="max-w-[90%] mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo Section */}
@@ -129,10 +167,51 @@ const Navbar = () => {
 
         {/* User, Favorites, and Cart Icons */}
         <div className="flex items-center gap-6 font-semibold">
-          {/* User Icon */}
-          <div className="flex items-center gap-1">
-            <User size={20} />
-            <span className="text-gray-700 font-medium">Account</span>
+          {/* Account Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={toggleAccountDropdown}
+              className="flex items-center gap-1 text-gray-700 font-medium"
+            >
+              <User size={20} />
+              <span>{currentUser ? "Account" : "Login"}</span>
+              <ChevronDown
+                size={16}
+                className={isAccountDropdownOpen ? "rotate-180" : ""}
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isAccountDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                {currentUser ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsAccountDropdownOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/auth/login"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsAccountDropdownOpen(false)}
+                  >
+                    Login
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Favorites Icon with Count */}
