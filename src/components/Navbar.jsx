@@ -1,75 +1,77 @@
-import { ChevronDown, Search, ShoppingCart, User, Heart } from "lucide-react";
 import React, { useState } from "react";
-import { useProduct } from "../context/ProductContext";
 import { Link, useNavigate } from "react-router-dom";
-import { generalProducts } from "../utils/data"; // Import product data
+import { useProduct } from "../context/ProductContext";
+import { generalProducts } from "../utils/data";
+import { ChevronDown, Search, ShoppingCart, User, Heart } from "lucide-react";
 
+// Navbar component that sticks to the top of the page
 const Navbar = () => {
+  // Access favorites and cart from ProductContext
   const { favorites, cart } = useProduct();
-  const navigate = useNavigate(); // For navigation
+  const navigate = useNavigate();
 
-  // Number of favorite products
-  const favoriteCount = favorites.length;
+  // Calculate counts for favorites and cart
+  const favoriteCount = favorites.length; // Number of favorite products
+  const uniqueCartCount = cart.length; // Number of unique products in cart
 
-  // Number of unique products in cart
-  const uniqueCartCount = cart.length;
-
-  // State for search input and filtered products
+  // State for search functionality
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Handle search input change
+  // Handle search input changes
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
 
+    // If the search query is empty, clear results and close dropdown
     if (query.trim() === "") {
       setFilteredProducts([]);
       setIsSearchOpen(false);
       return;
     }
 
-    // Filter products based on the search query
+    // Filter products based on the search query (case-insensitive)
     const results = generalProducts
       .filter((product) =>
         product.title.toLowerCase().includes(query.toLowerCase())
       )
-      .slice(0, 5); // Limit to 5 results
+      .slice(0, 5); // Show only top 5 results
 
     setFilteredProducts(results);
     setIsSearchOpen(true);
   };
 
-  // Handle clicking a search result
+  // Handle clicking a search result to navigate to the product page
   const handleSearchResultClick = (id) => {
-    setSearchQuery("");
-    setFilteredProducts([]);
-    setIsSearchOpen(false);
+    setSearchQuery(""); // Clear the search input
+    setFilteredProducts([]); // Clear the results
+    setIsSearchOpen(false); // Close the dropdown
     navigate(`/product/${id}`); // Navigate to the product page
   };
 
-  // Handle clicking outside the search dropdown to close it
+  // Close the search dropdown when clicking outside
   const handleBlur = () => {
     setTimeout(() => {
       setIsSearchOpen(false);
-    }, 200); // Delay to allow click on result
+    }, 200); // Small delay to allow clicking on a result
   };
 
   return (
-    <div className="w-full bg-white">
+    // Sticky navbar with a white background
+    <div className="w-full bg-white sticky top-0 z-50 shadow-sm">
       <div className="max-w-[90%] mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
+        {/* Logo Section */}
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2">
             <div className="h-12 w-12 overflow-hidden">
-              <img src="/logo.webp" alt="logo" />
+              <img src="/logo.webp" alt="Shopizio Logo" />
             </div>
             <span className="text-xl font-bold text-gray-800">Shopizio</span>
           </Link>
         </div>
 
-        {/* Nav Links */}
+        {/* Navigation Links (visible on medium screens and above) */}
         <div className="hidden md:flex items-center gap-8">
           <button disabled className="text-gray-700 font-medium">
             Deals
@@ -82,7 +84,7 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Search Bar */}
+        {/* Search Bar with Dropdown */}
         <div className="flex-1 max-w-md mx-4 relative">
           <div className="relative">
             <input
@@ -125,15 +127,15 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* User, Favorites, and Cart */}
+        {/* User, Favorites, and Cart Icons */}
         <div className="flex items-center gap-6 font-semibold">
-          {/* User */}
+          {/* User Icon */}
           <div className="flex items-center gap-1">
             <User size={20} />
             <span className="text-gray-700 font-medium">Account</span>
           </div>
 
-          {/* Favorites */}
+          {/* Favorites Icon with Count */}
           <Link to="/favourites" className="relative flex items-center gap-1">
             <Heart size={20} />
             <span className="text-gray-700 font-medium">Favorites</span>
@@ -144,7 +146,7 @@ const Navbar = () => {
             )}
           </Link>
 
-          {/* Cart */}
+          {/* Cart Icon with Count */}
           <Link to="/cart" className="relative flex items-center gap-1">
             <ShoppingCart size={20} />
             <span className="text-gray-700 font-medium">Cart</span>
