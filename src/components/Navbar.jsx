@@ -1,28 +1,32 @@
-import { ChevronDown, Search, ShoppingCart, User } from "lucide-react";
+import { ChevronDown, Search, ShoppingCart, User, Heart } from "lucide-react";
 import React from "react";
+import { useProduct } from "../context/ProductContext";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
+  const { favorites, cart } = useProduct();
+
+  // Number of favorite products
+  const favoriteCount = favorites.length;
+
+  // Number of unique products in cart.
+  const uniqueCartCount = cart.length;
+
   return (
     <div className="w-full bg-white">
       <div className="max-w-[90%] mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <div className="flex items-center gap-2">
-            <div className=" h-12 w-12 overflow-hidden">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="h-12 w-12 overflow-hidden">
               <img src="/logo.webp" alt="logo" />
             </div>
             <span className="text-xl font-bold text-gray-800">Shopizio</span>
-          </div>
+          </Link>
         </div>
 
         {/* Nav Links */}
         <div className="hidden md:flex items-center gap-8">
-          <div className="relative">
-            <button className="text-gray-700 font-medium flex items-center gap-1">
-              Categories
-              <ChevronDown size={20} />
-            </button>
-          </div>
           <button disabled className="text-gray-700 font-medium">
             Deals
           </button>
@@ -46,16 +50,37 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* User and Cart */}
-        <div className="flex items-center gap-10 font-semibold">
+        {/* User, Favorites, and Cart */}
+        <div className="flex items-center gap-6 font-semibold">
+          {/* User */}
           <div className="flex items-center gap-1">
-            <User />
+            <User size={20} />
             <span className="text-gray-700 font-medium">Account</span>
           </div>
-          <div className="flex items-center gap-1">
-            <ShoppingCart />
+
+          {/* Favorites */}
+          <Link to="/favourites" className="relative flex items-center gap-1">
+            <Heart size={20} />
+
+            <span className="text-gray-700 font-medium">Favorites</span>
+            {favoriteCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {favoriteCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Cart */}
+          <Link to="/cart" className="relative flex items-center gap-1">
+            <ShoppingCart size={20} />
+
             <span className="text-gray-700 font-medium">Cart</span>
-          </div>
+            {uniqueCartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {uniqueCartCount}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
     </div>
