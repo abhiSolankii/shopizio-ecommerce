@@ -1,0 +1,15 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Lato", sans-serif;
+}
+
+body {
+  background-color: #f6f6f2; /* Off-White for body background */
+  color: #388087; /* Dark Teal for text */
+  /* text-align: center; */
+}
+::-webkit-scrollbar {
+  display: none;
+}

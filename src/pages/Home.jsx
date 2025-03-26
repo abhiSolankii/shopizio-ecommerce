@@ -2,10 +2,11 @@ import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 
 const Home = () => {
-  useEffect(() => {
-    toast.success("Welcome to our website!");
-  }, []);
-  return <div>Home</div>;
+  return (
+    <div className="max-w-[90%] min-h-screen">
+      <div></div>
+    </div>
+  );
 };
 
 export default Home;
