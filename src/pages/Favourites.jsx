@@ -48,13 +48,13 @@ const Favourites = () => {
     <div className="max-w-[90%] mx-auto py-8 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-xl md:text-3xl font-bold text-gray-800">
           Your Favorites ({favorites.length})
         </h1>
         {favorites.length > 0 && (
           <button
             onClick={handleClearFavorites}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
+            className="flex items-center gap-2 px-2 md:px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
           >
             <Trash2 size={20} />
             Clear All
@@ -78,14 +78,14 @@ const Favourites = () => {
           {favorites.map((product) => (
             <div
               key={product.id}
-              className="flex bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 border border-gray-100"
+              className="flex flex-col md:flex-row bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 border border-gray-100"
             >
               {/* Product Image */}
-              <div className="w-40 h-40 mr-6">
+              <div className="w-full md:w-40 h-40 mb-4 md:mb-0 md:mr-6 flex justify-center">
                 <img
                   src={product.images[0]}
                   alt={product.title}
-                  className="w-full h-full object-cover rounded-lg shadow-sm"
+                  className="w-full md:w-full h-full object-cover rounded-lg shadow-sm"
                 />
               </div>
 
@@ -107,31 +107,31 @@ const Favourites = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center gap-3 mt-4">
+                <div className="flex flex-wrap items-center gap-3 mt-4">
                   <button
                     onClick={() => handleAddToCart(product)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all w-full md:w-auto"
                   >
                     <ShoppingCart size={18} />
                     Add to Cart
                   </button>
                   <button
                     onClick={() => handleViewProduct(product.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-all w-full md:w-auto"
                   >
                     <Eye size={18} />
                     View
                   </button>
                   <button
                     onClick={() => handleShare(product)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-all w-full md:w-auto"
                   >
                     <Share2 size={18} />
                     Share
                   </button>
                   <button
                     onClick={() => handleRemoveFromFavorites(product.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-all w-full md:w-auto"
                   >
                     <Trash2 size={18} />
                     Remove

@@ -42,13 +42,13 @@ const Cart = () => {
     <div className="max-w-[90%] mx-auto py-8 min-h-screen">
       {/* Cart Header */}
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-xl md:text-3xl font-bold text-gray-800">
           Your Cart ({getCartItemCount()} items)
         </h1>
         {cart.length > 0 && (
           <button
             onClick={handleClearCart}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
+            className="flex items-center gap-2 px-2 md:px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all"
           >
             <Trash2 size={20} />
             Clear Cart
@@ -75,10 +75,10 @@ const Cart = () => {
             {cart.map((item) => (
               <div
                 key={item.id}
-                className="flex bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all border border-gray-100"
+                className="flex flex-col md:flex-row bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all border border-gray-100"
               >
                 {/* Product Image */}
-                <div className="w-32 h-32 mr-6">
+                <div className="w-full md:w-32 md:h-32 h-40 mb-4 md:mb-0 md:mr-6 flex justify-center">
                   <img
                     src={item.images[0]}
                     alt={item.title}
@@ -103,7 +103,7 @@ const Cart = () => {
                   </div>
 
                   {/* Quantity and Actions */}
-                  <div className="flex items-center gap-4 mt-4">
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mt-4">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() =>
@@ -127,7 +127,7 @@ const Cart = () => {
                     </div>
                     <button
                       onClick={() => handleRemoveFromCart(item.id)}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-all"
+                      className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-all w-full md:w-auto"
                     >
                       <Trash2 size={18} />
                       Remove
@@ -136,7 +136,7 @@ const Cart = () => {
                 </div>
 
                 {/* Subtotal for this item */}
-                <div className="text-right">
+                <div className="text-right mt-4 md:mt-0">
                   <p className="text-lg font-semibold text-gray-800">
                     ${(item.price * item.quantity).toFixed(2)}
                   </p>

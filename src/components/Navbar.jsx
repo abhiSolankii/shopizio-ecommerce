@@ -10,6 +10,8 @@ import {
   User,
   Heart,
   LogOut,
+  Menu,
+  X,
 } from "lucide-react";
 
 // Navbar component that sticks to the top of the page
@@ -30,6 +32,7 @@ const Navbar = () => {
 
   // State for account dropdown
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Handle search input changes
@@ -109,7 +112,17 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Navigation Links (visible on medium screens and above) */}
+        {/* Mobile Menu Toggle for Small Screens */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="text-gray-700"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {/* Navigation Links (hidden on small screens) */}
         <div className="hidden md:flex items-center gap-8">
           <button disabled className="text-gray-700 font-medium">
             Deals
@@ -123,8 +136,8 @@ const Navbar = () => {
         </div>
 
         {/* Search Bar with Dropdown */}
-        <div className="flex-1 max-w-md mx-4 relative">
-          <div className="relative">
+        <div className="hidden md:flex flex-1 max-w-md mx-4 relative">
+          <div className="relative w-full">
             <input
               type="text"
               placeholder="Search Product"
@@ -166,7 +179,7 @@ const Navbar = () => {
         </div>
 
         {/* User, Favorites, and Cart Icons */}
-        <div className="flex items-center gap-6 font-semibold">
+        <div className="hidden md:flex items-center gap-6 font-semibold">
           {/* Account Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
@@ -236,6 +249,136 @@ const Navbar = () => {
             )}
           </Link>
         </div>
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 bg-white z-40 md:hidden">
+            <div className="flex flex-col h-full p-6">
+              {/* Mobile Close Button */}
+              <div className="flex justify-end mb-6">
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-gray-700"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* Mobile Search */}
+              <div className="mb-6">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search Product"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={() => setIsSearchOpen(true)}
+                    onBlur={handleBlur}
+                    className="w-full py-2 px-4 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <Search className="w-5 h-5 text-gray-500 absolute right-3 top-1/2 transform -translate-y-1/2" />
+                </div>
+                {/* Mobile Search Results (same as desktop) */}
+                {isSearchOpen && filteredProducts.length > 0 && (
+                  <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-80 overflow-y-auto">
+                    {filteredProducts.map((product) => (
+                      <div
+                        key={product.id}
+                        onClick={() => handleSearchResultClick(product.id)}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer"
+                      >
+                        <img
+                          src={product.images[0]}
+                          alt={product.title}
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-800 line-clamp-1">
+                            {product.title}
+                          </p>
+                          <p className="text-xs text-gray-600">
+                            ${product.price.toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Navigation Links */}
+              <div className="flex flex-col gap-4 mb-6">
+                <button
+                  disabled
+                  className="text-gray-700 font-medium text-left"
+                >
+                  Deals
+                </button>
+                <button
+                  disabled
+                  className="text-gray-700 font-medium text-left"
+                >
+                  What's New
+                </button>
+                <button
+                  disabled
+                  className="text-gray-700 font-medium text-left"
+                >
+                  Delivery
+                </button>
+              </div>
+
+              {/* Mobile Icons */}
+              <div className="flex flex-col gap-4">
+                {currentUser ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-2 text-gray-700"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <User size={20} />
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 text-gray-700"
+                    >
+                      <LogOut size={20} />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/auth/login"
+                    className="flex items-center gap-2 text-gray-700"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User size={20} />
+                    Login
+                  </Link>
+                )}
+
+                <Link
+                  to="/favourites"
+                  className="flex items-center gap-2 text-gray-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Heart size={20} />
+                  Favorites {favoriteCount > 0 && `(${favoriteCount})`}
+                </Link>
+
+                <Link
+                  to="/cart"
+                  className="flex items-center gap-2 text-gray-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <ShoppingCart size={20} />
+                  Cart {uniqueCartCount > 0 && `(${uniqueCartCount})`}
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

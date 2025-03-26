@@ -131,8 +131,6 @@ const Home = () => {
     });
   };
 
-  const handleAddToCart = (product) => {};
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) =>
@@ -214,21 +212,21 @@ const Home = () => {
         ))}
       </div>
       {/* Categories & Sort Section */}
-      <div className="flex items-center py-6 justify-between relative">
+      <div className="w-full flex flex-col md:flex-row gap-6 md:gap-0 items-center py-6 justify-between relative">
         {/* Categories */}
-        <div className="flex gap-4">
+        <div className="w-full grid grid-cols-3 md:flex gap-4">
           {categories.map((category) => (
             <button
               key={category.id}
               type="button"
-              className={`p-1 px-4 text-sm rounded-2xl hover:cursor-pointer transition-all ${
+              className={`p-1 px-4 text-sm rounded-2xl overflow-clip hover:cursor-pointer transition-all ${
                 selectedCategory === category.slug
                   ? "bg-gray-400 text-white"
                   : "bg-gray-300 hover:bg-gray-400 hover:text-white"
               }`}
               onClick={() => handleCategoryClick(category.slug)}
             >
-              {category.name}
+              {category.name.slice(0, 10)}
             </button>
           ))}
         </div>
@@ -238,8 +236,11 @@ const Home = () => {
           {/* All Filters Button */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 text-sm border border-gray-300 p-2 px-4 rounded-4xl"
-              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 text-sm border border-gray-300 p-2 px-4 rounded-4xl w-32"
+              onClick={() => {
+                setShowFilters(!showFilters);
+                setShowSort(false);
+              }}
             >
               <span>
                 <ListFilter size={20} />
@@ -249,7 +250,7 @@ const Home = () => {
 
             {/* Filters Dropdown */}
             {showFilters && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-10">
+              <div className="absolute left-0 md:right-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-10">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-sm font-semibold">Filters</h3>
                   <button onClick={() => setShowFilters(false)}>
@@ -324,22 +325,6 @@ const Home = () => {
                       <option value="metal">Metal</option>
                     </select>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Offer
-                    </label>
-                    <select
-                      name="offer"
-                      value={filters.offer}
-                      onChange={handleFilterChange}
-                      className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                    >
-                      <option value="">All</option>
-                      <option value="10+">10% Off & Up</option>
-                      <option value="20+">20% Off & Up</option>
-                      <option value="50+">50% Off & Up</option>
-                    </select>
-                  </div>
                 </div>
                 <div className="flex justify-between mt-4">
                   <button
@@ -363,7 +348,10 @@ const Home = () => {
           <div className="relative">
             <button
               className="flex items-center gap-2 text-sm border border-gray-300 p-2 px-4 rounded-4xl"
-              onClick={() => setShowSort(!showSort)}
+              onClick={() => {
+                setShowSort(!showSort);
+                setShowFilters(false);
+              }}
             >
               <span>
                 <ArrowDownNarrowWide size={20} />
@@ -430,20 +418,19 @@ const Home = () => {
               <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mx-auto gap-y-10 gap-x-6">
                 {paginatedProducts.map((product) => (
                   <div key={product.id} className="">
-                    <ProductCard
-                      product={product}
-                      onAddToCart={handleAddToCart}
-                    />
+                    <ProductCard product={product} />
                   </div>
                 ))}
               </div>
               {totalPages > 1 && (
-                <div className="flex overflow-x-auto sm:justify-center py-10">
-                  <CustomPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={onPageChange}
-                  />
+                <div className="w-full flex justify-center items-center">
+                  <div className="flex overflow-x-auto sm:justify-center py-10 ">
+                    <CustomPagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={onPageChange}
+                    />
+                  </div>
                 </div>
               )}
             </>

@@ -42,8 +42,8 @@ const Login = () => {
     }
   };
   return (
-    <div className="min-h-screen flex items-center justify-center ">
-      <div className="w-full max-w-md p-8 bg-[#F5F5F5] rounded-2xl shadow-xl">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-md p-8 md:bg-[#F5F5F5] rounded-2xl md:shadow-xl">
         {/* Logo Space */}
         <div className="h-20 mb-8 flex items-center justify-center">
           <div className="w-36 h-12 rounded-lg flex items-center justify-center">
