@@ -5,6 +5,11 @@
 - Live Application: https://shopizio.netlify.app/
 - GitHub Repository: https://github.com/abhiSolankii/shopizio-ecommerce.git
 
+## Credentials to test the application:
+
+- Email: test@gmail.com
+- Password: testtest
+
 **Shopizio** is a modern e-commerce web application built with React, Tailwind CSS, and Firebase. It provides a seamless shopping experience with features like product browsing, search, cart management, favorites, user authentication, and order placement. The app is designed to be responsive, user-friendly, and visually appealing, with a focus on clean code and maintainable architecture.
 
 ---
@@ -113,8 +118,7 @@ shopizio/
 │   ├── services/             # API service files
 │   │   ├── productService.js
 │   │   ├── categoryService.js
-│   │   ├── userService.js
-│   │   └── orderService.js
+│   │
 │   ├── utils/                # Utility functions and mock data
 │   │   ├── data.js           # Mock data (e.g., generalProducts)
 │   │   └── handlers.js       # Error handling utilities
@@ -150,8 +154,8 @@ Before setting up the project, ensure you have the following installed:
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/your-username/shopizio.git
-   cd shopizio
+   git clone https://github.com/abhiSolankii/shopizio-ecommerce.git
+   cd shopizio-ecommerce
    ```
 
 2. **Install Dependencies**:
@@ -202,7 +206,7 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
 VITE_FIREBASE_APP_ID=your-app-id
 
 # API Base URL (Fake Store API)
-VITE_API_BASE_URL=https://api.escuelajs.co/api/v1
+VITE_BASE_URL=https://api.escuelajs.co
 ```
 
 **Note**: The `VITE_` prefix is required for Vite to expose environment variables to the client-side code. Access these variables in your code using `import.meta.env.VITE_FIREBASE_API_KEY`, for example.
