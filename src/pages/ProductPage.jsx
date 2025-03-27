@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useProduct } from "../context/ProductContext";
-import { generalProducts } from "../utils/data";
 import { Star, Truck, Package, Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import productService from "../services/productService";
+import { errorHandler } from "../utils/handlers";
+import Loader from "../components/common/Loader";
 
 // A detailed product page with a clean, modern design
 const ProductPage = () => {
@@ -12,12 +14,34 @@ const ProductPage = () => {
   const { addToCart, isFavorite, removeFromFavorites, addToFavorites } =
     useProduct();
   const { currentUser } = useAuth();
+  const { getProductById, loading } = productService();
 
   // Find the product by ID
-  const product = generalProducts.find((p) => p.id === parseInt(id));
+  // const product = generalProducts.find((p) => p.id === parseInt(id));
+  const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState("Pink"); // Hardcoded default color
 
+  // fetch product from API
+  const fetchProduct = async () => {
+    try {
+      const data = await getProductById(id);
+      setProduct(data);
+    } catch (error) {
+      errorHandler(error);
+    }
+  };
+  useEffect(() => {
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div>
+        <Loader fullScreen={true} />
+      </div>
+    );
+  }
   // If product not found, show a message
   if (!product) {
     return (

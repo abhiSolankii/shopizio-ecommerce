@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, User, Edit, Lock } from "lucide-react";
+import { LogOut, Edit, Lock } from "lucide-react";
 import { useProduct } from "../context/ProductContext";
+import Loader from "../components/common/Loader";
 
 // A simple profile page showing user details
 const Profile = () => {
   const { currentUser, logout } = useAuth();
   const { clearCart, clearFavorites } = useProduct();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // If no user is logged in, redirect to login
@@ -22,12 +24,15 @@ const Profile = () => {
   // Handle logout
   const handleLogout = async () => {
     try {
+      setLoading(true);
       await logout();
       navigate("/auth/login");
       clearCart();
       clearFavorites();
     } catch (error) {
       console.error("Logout failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,8 +78,14 @@ const Profile = () => {
             onClick={handleLogout}
             className="w-full flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-all"
           >
-            <LogOut size={18} />
-            Logout
+            {loading ? (
+              <Loader size="20px" />
+            ) : (
+              <p className="flex items-center gap-2">
+                <LogOut size={18} />
+                Logout
+              </p>
+            )}
           </button>
         </div>
       </div>

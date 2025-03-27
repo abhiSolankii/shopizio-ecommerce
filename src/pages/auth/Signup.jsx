@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { errorHandler } from "../../utils/handlers";
+import Loader from "../../components/common/Loader";
 
 const Signup = () => {
   useEffect(() => {
@@ -13,6 +14,7 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const { signup, signInWithGoogle } = useAuth();
 
   const navigate = useNavigate();
@@ -25,11 +27,14 @@ const Signup = () => {
       return;
     }
     try {
+      setLoading(true);
       await signup(email, password);
       navigate("/");
       toast.success("Account created successfully!");
     } catch (error) {
       errorHandler(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,14 +44,17 @@ const Signup = () => {
       return;
     }
     try {
+      setLoading(true);
       await signInWithGoogle();
       navigate("/");
       toast.success("Signed in with Google!");
     } catch (error) {
       errorHandler(error);
+    } finally {
+      setLoading(false);
     }
   };
-
+  if (loading) return <Loader fullScreen={true} />;
   return (
     <div className="min-h-screen flex items-center justify-center ">
       <div className="w-full max-w-md p-8 md:bg-[#F5F5F5] rounded-2xl md:shadow-xl">

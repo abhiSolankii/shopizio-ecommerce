@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { errorHandler } from "../../utils/handlers";
 import toast from "react-hot-toast";
+import Loader from "../../components/common/Loader";
 
 const Login = () => {
   useEffect(() => {
@@ -15,16 +16,20 @@ const Login = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       await login(email, password);
       navigate("/");
-      toast.success("Account created successfully!");
+      toast.success("Logged in successfully");
     } catch (error) {
       errorHandler(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,14 +38,20 @@ const Login = () => {
       errorHandler({}, "Google Sign-In is not available.");
       return;
     }
+
     try {
+      setLoading(true);
       await signInWithGoogle();
       navigate("/");
       toast.success("Signed in with Google!");
     } catch (error) {
       errorHandler(error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) return <Loader fullScreen={true} />;
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md p-8 md:bg-[#F5F5F5] rounded-2xl md:shadow-xl">

@@ -7,7 +7,10 @@ import {
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
-import { generalProducts, productCategories } from "../utils/data";
+import { errorHandler } from "../utils/handlers";
+import productService from "../services/productService";
+import Loader from "../components/common/Loader";
+import categoryService from "../services/categoryService";
 
 const bannerImages = [
   "/assets/carousel-images/carousel3.jpg",
@@ -80,8 +83,15 @@ const CustomPagination = ({ currentPage, totalPages, onPageChange }) => {
 };
 
 const Home = () => {
+  const {
+    getAllProducts,
+    getProductsByCategory,
+    filterProductsByPrice,
+    loading,
+  } = productService();
+  const { getAllCategories } = categoryService();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [categories, setCategories] = useState(productCategories);
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
@@ -92,18 +102,48 @@ const Home = () => {
     material: "",
     offer: "",
   });
-  const [products, setProducts] = useState(generalProducts);
+  const [products, setProducts] = useState([]);
   const [sortOption, setSortOption] = useState("default");
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8; // Number of products per page
+
+  //fetch products from API
+  const fetchProducts = async () => {
+    try {
+      const data = await getAllProducts();
+      setProducts(data);
+    } catch (error) {
+      errorHandler(error);
+    }
+  };
+  //fetch categories from API
+  const fetchCategories = async () => {
+    try {
+      const data = await getAllCategories();
+      setCategories(data);
+    } catch (error) {
+      errorHandler(error);
+    }
+  };
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
 
   const onPageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top on page change
   };
 
-  const handleCategoryClick = (slug) => {
-    setSelectedCategory(slug === selectedCategory ? null : slug);
+  const handleCategoryClick = (category) => {
+    setFilters({
+      price: "",
+      review: "",
+      color: "",
+      material: "",
+      offer: "",
+    });
+    setSelectedCategory(category.id === selectedCategory?.id ? null : category);
     setCurrentPage(1); // Reset to first page on category change
   };
 
@@ -141,46 +181,47 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Filter and sort products
-  var filteredProducts = [...products];
+  //filter by category with API
+  const filterByCategory = async (category) => {
+    if (category) {
+      const data = await getProductsByCategory(selectedCategory?.id);
+      setProducts(data);
+    }
+  };
+  useEffect(() => {
+    filterByCategory(selectedCategory);
+  }, [selectedCategory]);
 
-  // Apply category filter
-  if (selectedCategory) {
-    filteredProducts = filteredProducts.filter(
-      (product) => product.category.slug === selectedCategory
-    );
-  }
+  //Apply filters
+  const filterProductsByPriceFunc = async () => {
+    if (filters.price) {
+      setSelectedCategory(null);
+      const [min, max] = filters.price.split("-").map(Number);
+      //pass min and max to API
+      const data = await filterProductsByPrice(min, max, selectedCategory?.id);
+      setProducts(data);
+    } else {
+      fetchProducts();
+    }
+  };
 
-  // Apply filters
-  if (filters.price) {
-    const [min, max] = filters.price.split("-").map(Number);
-    filteredProducts = filteredProducts.filter(
-      (product) => product.price >= min && (max ? product.price <= max : true)
-    );
-  }
-
-  if (filters.review) {
-    const minRating = Number(filters.review.replace("+", ""));
-    filteredProducts = filteredProducts.filter(
-      (product) => (product.rating || 0) >= minRating
-    );
-  }
+  useEffect(() => {
+    filterProductsByPriceFunc();
+  }, [filters.price]);
 
   // Add more filter logic as needed (color, material, offer)
 
   // Apply sorting
   if (sortOption === "price-low-high") {
-    filteredProducts.sort((a, b) => a.price - b.price);
+    products.sort((a, b) => a.price - b.price);
   } else if (sortOption === "price-high-low") {
-    filteredProducts.sort((a, b) => b.price - a.price);
+    products.sort((a, b) => b.price - a.price);
   } else if (sortOption === "newest") {
-    filteredProducts.sort(
-      (a, b) => new Date(b.creationAt) - new Date(a.creationAt)
-    );
+    products.sort((a, b) => new Date(b.creationAt) - new Date(a.creationAt));
   }
 
   // Calculate total pages dynamically based on filtered products
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
   // Reset currentPage if it exceeds the new totalPages
   if (currentPage > totalPages && totalPages > 0) {
@@ -191,7 +232,7 @@ const Home = () => {
 
   // Paginate products
   const startIndex = (currentPage - 1) * productsPerPage;
-  const paginatedProducts = filteredProducts.slice(
+  const paginatedProducts = products.slice(
     startIndex,
     startIndex + productsPerPage
   );
@@ -214,21 +255,27 @@ const Home = () => {
       {/* Categories & Sort Section */}
       <div className="w-full flex flex-col md:flex-row gap-6 md:gap-0 items-center py-6 justify-between relative">
         {/* Categories */}
-        <div className="w-full grid grid-cols-3 md:flex gap-4">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              type="button"
-              className={`p-1 px-4 text-sm rounded-2xl overflow-clip hover:cursor-pointer transition-all ${
-                selectedCategory === category.slug
-                  ? "bg-gray-400 text-white"
-                  : "bg-gray-300 hover:bg-gray-400 hover:text-white"
-              }`}
-              onClick={() => handleCategoryClick(category.slug)}
-            >
-              {category.name.slice(0, 10)}
-            </button>
-          ))}
+        <div className="w-full ">
+          {loading ? (
+            <Loader size="20px" />
+          ) : (
+            <div className="w-full grid grid-cols-3 md:flex gap-4">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  className={`p-1 px-4 text-sm rounded-2xl overflow-clip hover:cursor-pointer transition-all ${
+                    selectedCategory?.id === category.id
+                      ? "bg-gray-400 text-white"
+                      : "bg-gray-300 hover:bg-gray-400 hover:text-white"
+                  }`}
+                  onClick={() => handleCategoryClick(category)}
+                >
+                  {category.name.slice(0, 10)}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Sort and Filters */}
@@ -404,38 +451,42 @@ const Home = () => {
         <p className="font-semibold text-black text-2xl">
           {selectedCategory == null
             ? "Products"
-            : selectedCategory.charAt(0).toUpperCase() +
-              selectedCategory.slice(1)}{" "}
+            : selectedCategory.name.charAt(0).toUpperCase() +
+              selectedCategory.name.slice(1)}{" "}
           For You!
         </p>
-        <div className="w-full py-4">
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-lg text-gray-600">No products found.</p>
-            </div>
-          ) : (
-            <>
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mx-auto gap-y-10 gap-x-6">
-                {paginatedProducts.map((product) => (
-                  <div key={product.id} className="">
-                    <ProductCard product={product} />
-                  </div>
-                ))}
+        {loading ? (
+          <Loader my={32} />
+        ) : (
+          <div className="w-full py-4">
+            {products.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-lg text-gray-600">No products found.</p>
               </div>
-              {totalPages > 1 && (
-                <div className="w-full flex justify-center items-center">
-                  <div className="flex overflow-x-auto sm:justify-center py-10 ">
-                    <CustomPagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={onPageChange}
-                    />
-                  </div>
+            ) : (
+              <>
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mx-auto gap-y-10 gap-x-6">
+                  {paginatedProducts.map((product) => (
+                    <div key={product.id} className="">
+                      <ProductCard product={product} />
+                    </div>
+                  ))}
                 </div>
-              )}
-            </>
-          )}
-        </div>
+                {totalPages > 1 && (
+                  <div className="w-full flex justify-center items-center">
+                    <div className="flex overflow-x-auto sm:justify-center py-10 ">
+                      <CustomPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={onPageChange}
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
       {/* Popular Categories */}
       <div className="pb-4 flex flex-col">
