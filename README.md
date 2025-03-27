@@ -1,14 +1,9 @@
 # Shopizio - E-Commerce Platform
 
-![Shopizio Logo](public/logo.webp)
-
----
-
 ## Project Links:
 
-- Postman Documentation: https://documenter.getpostman.com/view/34455053/2sAYkKJdAt
-- Live Application: https://drone-ops.netlify.app/
-- GitHub Repository: https://github.com/abhiSolankii/drone-ops.git
+- Live Application: https://shopizio.netlify.app/
+- GitHub Repository: https://github.com/abhiSolankii/shopizio-ecommerce.git
 
 **Shopizio** is a modern e-commerce web application built with React, Tailwind CSS, and Firebase. It provides a seamless shopping experience with features like product browsing, search, cart management, favorites, user authentication, and order placement. The app is designed to be responsive, user-friendly, and visually appealing, with a focus on clean code and maintainable architecture.
 
