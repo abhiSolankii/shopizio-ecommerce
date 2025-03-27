@@ -17,7 +17,6 @@ const ProductPage = () => {
   const { getProductById, loading } = productService();
 
   // Find the product by ID
-  // const product = generalProducts.find((p) => p.id === parseInt(id));
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState("Pink"); // Hardcoded default color

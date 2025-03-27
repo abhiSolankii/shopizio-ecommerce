@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useProduct } from "../context/ProductContext";
-import { useAuth } from "../context/AuthContext"; // Import AuthContext
-import { generalProducts } from "../utils/data";
+import { useAuth } from "../context/AuthContext";
 import {
   ChevronDown,
   Search,
@@ -13,12 +12,15 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { errorHandler } from "../utils/handlers";
+import productService from "../services/productService";
 
 // Navbar component that sticks to the top of the page
 const Navbar = () => {
   // Access favorites and cart from ProductContext
   const { favorites, cart, clearCart, clearFavorites } = useProduct();
   const { currentUser, logout } = useAuth(); // Access auth state and logout function
+  const { getAllProducts } = productService();
   const navigate = useNavigate();
 
   // Calculate counts for favorites and cart
@@ -28,6 +30,7 @@ const Navbar = () => {
   // State for search functionality
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // State for account dropdown
@@ -35,6 +38,18 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  //fetch products from API
+  const fetchProducts = async () => {
+    try {
+      const data = await getAllProducts();
+      setProducts(data);
+    } catch (error) {
+      errorHandler(error);
+    }
+  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
   // Handle search input changes
   const handleSearchChange = (e) => {
     const query = e.target.value;
@@ -46,7 +61,7 @@ const Navbar = () => {
       return;
     }
 
-    const results = generalProducts
+    const results = products
       .filter((product) =>
         product.title.toLowerCase().includes(query.toLowerCase())
       )

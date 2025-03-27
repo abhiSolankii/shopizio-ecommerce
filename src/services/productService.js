@@ -55,6 +55,19 @@ const productService = () => {
       throw new Error(`Failed to fetch products by price: ${error.message}`);
     }
   };
+  const searchProducts = async (query) => {
+    try {
+      const response = await apiRequest("GET", "/products");
+      const products = response.data;
+      return products
+        .filter((product) =>
+          product.title.toLowerCase().includes(query.toLowerCase())
+        )
+        .slice(0, 5); // Return top 5 results
+    } catch (error) {
+      throw new Error(`Failed to search products: ${error.message}`);
+    }
+  };
 
   return {
     getAllProducts,
