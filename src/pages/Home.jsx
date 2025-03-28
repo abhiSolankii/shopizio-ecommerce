@@ -259,7 +259,7 @@ const Home = () => {
           {loading ? (
             <Loader size="20px" />
           ) : (
-            <div className="w-full grid grid-cols-3 md:flex gap-4">
+            <div className="w-full grid grid-cols-3 md:grid-cols-10 gap-4">
               {categories.map((category) => (
                 <button
                   key={category.id}
